@@ -58,7 +58,7 @@ namespace AppGui
 
             // NEW 16 april 2020
             //init LifeCycleEvents..
-            //lce = new LifeCycleEvents("APP", "TTS", "User1", "na", "command"); // LifeCycleEvents(string source, string target, string id, string medium, string mode
+            lce = new LifeCycleEvents("APP", "TTS", "User1", "na", "command"); // LifeCycleEvents(string source, string target, string id, string medium, string mode
             // MmiCommunication(string IMhost, int portIM, string UserOD, string thisModalityName)
             mmic = new MmiCommunication("localhost", 8000, "User1", "GUI");
 
@@ -121,6 +121,7 @@ namespace AppGui
                         {
                             driver.FindElement(By.Id("btnNewGame")).Click();
                             System.Diagnostics.Debug.WriteLine("O jogo está a ser iniciado.");
+                            call_tts("O jogo está a ser iniciado.");
                         }
                         break;
                     case "END":
@@ -128,6 +129,7 @@ namespace AppGui
                         {
                             driver.FindElement(By.Id("help-button")).Click();
                             System.Diagnostics.Debug.WriteLine("O jogo foi terminado.");
+                            call_tts("O jogo foi terminado.");
                         }
                         break;
                     case "RESTART":
@@ -135,6 +137,7 @@ namespace AppGui
                         {
                             driver.FindElement(By.Id("fold-button")).Click();
                             System.Diagnostics.Debug.WriteLine("A reiniciar o jogo.");
+                            call_tts("A reiniciar o jogo.");
                         }
                         if (driver.FindElements(By.XPath("//*[@id=\"modal-box\"]/table/tbody/tr/td/table/tbody/tr/td/div/a")).Count() > 0)
                         {
@@ -146,6 +149,7 @@ namespace AppGui
                         {
                             driver.FindElement(By.Id("call-button")).Click();
                             System.Diagnostics.Debug.WriteLine("Continuar Jogo");
+                            call_tts("Continuar Jogo");
                         }
                         break;
                     case "PLAYERNAME":
@@ -165,7 +169,8 @@ namespace AppGui
                         if (driver.FindElements(By.Id("call-button")).Count() > 0)
                         {
                             driver.FindElement(By.Id("call-button")).Click();
-
+                            System.Diagnostics.Debug.WriteLine("Você passou a jogada.");
+                            call_tts("Você passou a jogada.");
                         }
                         break;
 
@@ -173,6 +178,8 @@ namespace AppGui
                         if (driver.FindElements(By.Id("call-button")).Count() > 0)
                         {
                             driver.FindElement(By.Id("call-button")).Click();
+                            System.Diagnostics.Debug.WriteLine("Você igualou a aposta.");
+                            call_tts("Você igualou a jogada.");
                         }
 
                         break;
@@ -182,6 +189,7 @@ namespace AppGui
                             var v_min = driver.FindElement(By.Id("raise-button")).Text.Split('$')[1];
                             driver.FindElement(By.XPath("//*[@id=\"raise-button\"]")).Click();
                             System.Diagnostics.Debug.WriteLine("Foram apostados " + v_min + " dólares.");
+                            call_tts("Foram apostados " + v_min + " dólares.");
 
                         }
                         break;
@@ -190,7 +198,8 @@ namespace AppGui
                         if (driver.FindElements(By.Id("fold-button")).Count() > 0)
                         {
                             driver.FindElement(By.Id("fold-button")).Click();
-                            System.Diagnostics.Debug.WriteLine("Você passou a jogada.");
+                            System.Diagnostics.Debug.WriteLine("Você desistiu.");
+                            call_tts("Você desistiu da jogada.");
                         }
                         break;
                     case "ALLIN": //Adaptar(?)
@@ -237,6 +246,7 @@ namespace AppGui
                         {
                             String pot_total = driver.FindElement(By.Id("total-pot")).Text;
                             System.Diagnostics.Debug.WriteLine("O valor total apostado atualmente é " + pot_total.Split('$')[1] + "dólares");
+                            call_tts("O valor total apostado atualmente é " + pot_total.Split('$')[1] + "dólares");
                         }
                         //procurar valor no id="total-pot"
                         break;
@@ -266,6 +276,7 @@ namespace AppGui
                     case "CASH":
                         String saldo = get_Current_Cash().ToString();
                         System.Diagnostics.Debug.WriteLine("O seu saldo atual é de " + saldo + " dólares.");
+                        call_tts("O seu saldo atual é de " + saldo + " dólares.");
                         break;
                         
 
@@ -326,6 +337,7 @@ namespace AppGui
             var textCardC2 = cards[card2];
 
             System.Diagnostics.Debug.WriteLine("A sua mão contem " + textCardC1 + " e " + textCardC2);
+            call_tts("A sua mão contem " + textCardC1 + " e " + textCardC2);
         }
 
         private void cardsInTable()
@@ -354,13 +366,28 @@ namespace AppGui
             if(cardsString == "")
             {
                 System.Diagnostics.Debug.WriteLine("A mesa está vazia.");
+                call_tts("A mesa está vazia.");
             }
             else
             {
                 System.Diagnostics.Debug.WriteLine("A mesa contém " + cardsString);
+                call_tts("A mesa contém " + cardsString);
             }
 
            
+        }
+
+        private void call_tts(String speech)
+        {
+            System.Diagnostics.Debug.WriteLine("Calling TTS");
+            //  new 16 april 2020
+            mmic.Send(lce.NewContextRequest());
+
+            string json2 = "";
+            json2 += speech;
+
+            var exNot = lce.ExtensionNotification(0 + "", 0 + "", 1, json2);
+            mmic.Send(exNot);
         }
 
         private Dictionary<String,String> addCards()

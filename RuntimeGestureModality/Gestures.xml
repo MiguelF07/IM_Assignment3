@@ -20,4 +20,9 @@
     <NAME>RAISE</NAME>
     <SEMANTIC>RAISE</SEMANTIC>
   </Gesture>
+  <Gesture>
+    <ID>4</ID>
+    <NAME>START</NAME>
+    <SEMANTIC>START</SEMANTIC>
+  </Gesture>
 </Gestures>
